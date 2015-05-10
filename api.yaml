@@ -14,7 +14,7 @@ info:
     name: Hasan Pekdemir
     url: will be set in future
     email: hpekdemir.smart@googlemail.com
-host: fbsd01:3000
+host: localhost:3000
 basePath: /api/v1
 schemes:
   - http
