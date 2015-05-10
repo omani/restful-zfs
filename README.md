@@ -63,4 +63,4 @@ Hasan Pekdemir
 hpekdemir.smart@googlemail.com
 
 ## License
-See LICENSE file
+Released under the FreeBSD License (See the LICENSE file)
