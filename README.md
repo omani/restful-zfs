@@ -57,3 +57,10 @@ Feel free to contribute
 * Commit
 * Start pull request
 * Get your name into the list of contributors
+
+## Maintainer
+Hasan Pekdemir
+hpekdemir.smart@googlemail.com
+
+## License
+See LICENSE file
