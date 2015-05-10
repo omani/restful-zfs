@@ -1,0 +1,190 @@
+---
+############################################
+# Swagger2 HEADER
+############################################
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: ZFS JSON API
+  description: A JSON REST API for the ZFS cli
+  license:
+    name: FreeBSD License
+    url: https://www.freebsd.org/copyright/freebsd-license.html
+  contact:
+    name: Hasan Pekdemir
+    url: will be set in future
+    email: hpekdemir.smart@googlemail.com
+host: fbsd01:3000
+basePath: /api/v1
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+############################################
+# ALL PATHS
+############################################
+paths:
+  # Pools
+  /pools:
+    get:
+      x-mojo-controller: API::zpool
+      summary: List all zfs pools
+      operationId: zpoolList
+      tags:
+        - zpool
+      responses:
+        200:
+          description: A collection of zfs pools
+          schema:
+            type: object
+            items:
+              $ref: zpoolList
+        default:
+          description: unexpected error
+          schema:
+            $ref: Error
+    post:
+      x-mojo-controller: API::zpool
+      summary: Create a new ZFS pool
+      operationId: zpoolCreate
+      parameters:
+        - name: data
+          in: body
+          description: JSON with data
+          schema:
+            type: object
+            items:
+              $ref: zpoolCreate
+      responses:
+        201:
+          description: A collection of the new pool
+          schema:
+            $ref: zpoolCreated
+        400:
+          description: Not found message
+          schema:
+            $ref: NotFound
+        default:
+          description: unexpected error
+          schema:
+            $ref: Error
+  "/pool/{poolname}":
+    get:
+      x-mojo-controller: API::zpool
+      summary: List zfs pool given by name
+      operationId: zpoolList_poolname
+      responses:
+        200:
+          description: A collection of a zfs pool
+          schema:
+            type: object
+            items:
+              $ref: zpoolList
+        400:
+          description: Not found message
+          schema:
+            $ref: NotFound
+        default:
+          description: unexpected error
+          schema:
+            $ref: Error
+############################################
+
+
+
+
+
+
+############################################
+# DEFINITIONS
+############################################
+definitions:
+
+  ## Schemas
+  
+  # List zpools
+  zpoolList:
+    required:
+      - NAME
+      - SIZE
+      - ALLOC
+      - FREE
+      - FRAG
+      - EXPANDSZ
+      - CAP
+      - DEDUP
+      - HEALTH
+      - ALTROOT
+    properties:
+      NAME:
+        type: string
+      SIZE:
+        type: string
+      ALLOC:
+        type: string
+      FREE:
+        type: string
+      FRAG:
+        type: string
+      EXPANDSZ:
+        type: string
+      CAP:
+        type: string
+      DEDUP:
+        type: string
+      HEALTH:
+        type: string
+      ALTROOT:
+        type: string
+
+  zpoolCreated:
+    required:
+      - message
+      - data
+    properties:
+      message:
+        type: string
+      data:
+        type: object
+        $ref: zpoolList
+  NotFound:
+    required:
+      - error
+    properties:
+      error:
+        type: object
+        items:
+          code:
+            type: integer
+            format: int32
+          message:
+            type: string
+  # Create zpool
+  zpoolCreate:
+    required:
+      - name
+      - vdevs
+    properties:
+      name:
+        type: string
+        description: name of the new pool
+      vdevs:
+        type: array
+        items:
+          type: string
+          description: name of the vdevs to be used as devices in pool
+  ## ERRORS
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+############################################

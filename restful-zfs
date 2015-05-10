@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+
+# auskommentieren für par packer (wichtig)
+# BEGIN {
+#     if(exists $ENV{PAR_TEMP}) {
+#         my $dir = $ENV{PAR_TEMP};
+#         chdir $dir;
+#         my @substitutions = qw/Mojo Mojolicious/;
+#         for(@substitutions){
+#             next if -l;
+#             symlink "inc/$_", $_
+#                 or die "Can't symlink $_ at $dir: $!";
+#         }
+#         print "I'm at at $dir\n";
+#     }
+# }
+
+use Mojolicious::Lite;
+use Mojo::Server::Daemon;
+
+# Explicit use as a helper for PAR
+use Mojolicious::Plugin::DefaultHelpers;
+use Mojolicious::Plugin::EPLRenderer;
+use Mojolicious::Plugin::EPRenderer;
+use Mojolicious::Plugin::HeaderCondition;
+use Mojolicious::Plugin::TagHelpers;
+use Mojolicious::Plugin::Swagger2;
+use YAML;
+
+use Data::Dumper;
+use Backticks;
+
+app->config(hypnotoad => {listen => ['http://*:3000']});
+
+# Documentation browser under "/perldoc"
+# auskommentieren für par packer (wichtig)
+#plugin 'Swagger2' => { url => "$ENV{PAR_TEMP}/inc/api.yaml" };
+plugin 'Swagger2' => { url => app->home->rel_file('api.yaml') };
+
+get '/' => sub {
+  my $c = shift;
+  my $ret = Backticks->run('zpool list');
+  print Dumper $ret->stdout;
+  my $POOL = {};
+  (
+    $POOL->{name}->{desc},
+    $POOL->{size}->{desc},
+    $POOL->{alloc}->{desc},
+    $POOL->{free}->{desc},
+    $POOL->{frag}->{desc},
+    $POOL->{expandsz}->{desc},
+    $POOL->{cap}->{desc},
+    $POOL->{dedup}->{desc},
+    $POOL->{health}->{desc},
+    $POOL->{altroot}->{desc},
+    $POOL->{name}->{value},
+    $POOL->{size}->{value},
+    $POOL->{alloc}->{value},
+    $POOL->{free}->{value},
+    $POOL->{frag}->{value},
+    $POOL->{expandsz}->{value},
+    $POOL->{cap}->{value},
+    $POOL->{dedup}->{value},
+    $POOL->{health}->{value},
+    $POOL->{altroot}->{value}
+  ) = map { split /\s+/ } $ret->stdout =~ /(.*)/s;
+  print Dumper $POOL;
+  $c->stash(ret => $ret);
+  $c->render(template => 'index');
+};
+
+
+app->start;
+
+
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+% title 'Welcome';
+Welcome to the Mojolicious real-time web framework!
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+  <head><title><%= title %></title></head>
+  <body>
+  	<p><%= stash('ret')->stdout %></p>
+  	<p><%= stash('ret')->signal %></p>
+  	<p><%= stash('ret')->returncode %></p>
+  	<p><%= stash('ret')->exitcode %></p>
+  </body>
+</html>
