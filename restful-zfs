@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# auskommentieren für par packer (wichtig)
+# comment out (only uncomment for par packer)
 # BEGIN {
 #     if(exists $ENV{PAR_TEMP}) {
 #         my $dir = $ENV{PAR_TEMP};
@@ -33,14 +33,14 @@ use Backticks;
 app->config(hypnotoad => {listen => ['http://*:3000']});
 
 # Documentation browser under "/perldoc"
-# auskommentieren für par packer (wichtig)
+# comment out next line (only uncomment par packer)
 #plugin 'Swagger2' => { url => "$ENV{PAR_TEMP}/inc/api.yaml" };
 plugin 'Swagger2' => { url => app->home->rel_file('api.yaml') };
 
 get '/' => sub {
   my $c = shift;
   my $ret = Backticks->run('zpool list');
-  print Dumper $ret->stdout;
+  # print Dumper $ret->stdout;
   my $POOL = {};
   (
     $POOL->{name}->{desc},
@@ -64,7 +64,7 @@ get '/' => sub {
     $POOL->{health}->{value},
     $POOL->{altroot}->{value}
   ) = map { split /\s+/ } $ret->stdout =~ /(.*)/s;
-  print Dumper $POOL;
+  #print Dumper $POOL;
   $c->stash(ret => $ret);
   $c->render(template => 'index');
 };

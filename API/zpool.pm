@@ -55,6 +55,19 @@ sub zpool_list_poolname {
   }  
 }
 
+
+sub zpool_destroy {
+  my ($self, $args, $cb) = @_;
+  my $params = decode_json $self->req->body;
+  my $ret = _run_command(Backticks->new("zpool destroy $params->{name}"));
+
+  if (ref $ret eq 'ARRAY') {
+    return $self->$cb( { message => "Pool was destroyed." }, 200);
+  } else {
+    return $self->$cb( { error => { code => $ret->returncode, message => _prepare_error($ret) } }, 400) if $ret->returncode() > 0;
+  }  
+}
+
 # private methods
 sub _run_command {
   my $cmd = shift->run();

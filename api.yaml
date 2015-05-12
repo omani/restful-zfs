@@ -14,7 +14,7 @@ info:
     name: Hasan Pekdemir
     url: will be set in future
     email: hpekdemir.smart@googlemail.com
-host: localhost:3000
+host: fbsd01:3000
 basePath: /api/v1
 schemes:
   - http
@@ -62,7 +62,7 @@ paths:
         201:
           description: A collection of the new pool
           schema:
-            $ref: zpoolCreated
+            $ref: zpoolCollection
         400:
           description: Not found message
           schema:
@@ -71,6 +71,30 @@ paths:
           description: unexpected error
           schema:
             $ref: Error
+    delete:
+      x-mojo-controller: API::zpool
+      summary: Delete a ZFS pool
+      operationId: zpoolDestroy
+      parameters:
+        - name: data
+          in: body
+          description: JSON with data
+          schema:
+            type: object
+            items:
+              $ref: zpoolDestroy
+      responses:
+        200:
+          description: A collection of the destroyed pool
+          schema:
+            type: object
+            items:
+              message:
+                type: string
+        400:
+          description: Not found message
+          schema:
+            $ref: NotFound
   "/pool/{poolname}":
     get:
       x-mojo-controller: API::zpool
@@ -140,7 +164,7 @@ definitions:
       ALTROOT:
         type: string
 
-  zpoolCreated:
+  zpoolCollection:
     required:
       - message
       - data
@@ -176,6 +200,14 @@ definitions:
         items:
           type: string
           description: name of the vdevs to be used as devices in pool
+  # Destroy zpool
+  zpoolDestroy:
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        description: name of the pool to be destroyed
   ## ERRORS
   Error:
     required:
