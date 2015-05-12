@@ -12,6 +12,7 @@ Please have a look at the **Features** section for more information about what i
 ## Features (currently)
 * List ZFS pools
 * Create ZFS pools
+* Destroy ZFS pools
 * and many more soon...
 
 ## Dependencies
